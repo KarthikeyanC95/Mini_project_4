@@ -5,233 +5,392 @@ from streamlit_lottie import st_lottie
 from PIL import Image
 from streamlit_option_menu import option_menu
 import numpy as np
-Attrition_model = pickle.load(open("E:\Employee Attrition Analysis and Prediction\Employee_Attrition.sav", "rb"))
-Promotion_model = pickle.load(open("E:\Employee Attrition Analysis and Prediction\Employee_Promotion.sav", "rb"))
+import pandas as pd
+import joblib
 
-with st.sidebar:
-    selected = option_menu('Employee Attrition Analysis and Prediction',
-                           
-                           ['Employee Attrition Prediction',
-                            'Employee Promotion Prediction'],
-                            menu_icon='employee-fill',
-                            icons= ['employee', 'job', 'performace', 'Promotion'],
-                            default_index = 0)
-    
+st.set_page_config(layout="wide")
+
+watermark_css = """
+<style>
+    .watermark {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        font-size: 14px;
+        color: gray;
+        opacity: 0.7;
+    }
+</style>
+<div class="watermark"> Data Scientist Karthikeyan</div>
+"""
+
+
+st.markdown(watermark_css, unsafe_allow_html=True)
+
+# Custom CSS for the watermark
+
+
+st.markdown(
+        """
+        <style>
+            div.stButton > button {
+                width: 100%; /* Full Width Inside Column */
+                height: 50px;
+                font-size: 18px;
+                font-weight: bold;
+                color: #0047AB;  /* Ocean Blue Text */
+                text-align: center;
+                background: white; /* White Background */
+                border: 2px solid #0047AB; /* Blue Border */
+                border-radius: 8px;
+                cursor: pointer;
+                transition: 0.3s;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            div.stButton > button:hover {
+                background: #0047AB; /* Blue Background on Hover */
+                color: white; /* White Text on Hover */
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+#for button backgroun
+st.markdown(
+        """
+        <style>
+            div.stButton > button {
+                width: 100%; /* Full Width Inside Column */
+                height: 50px;
+                font-size: 18px;
+                font-weight: bold;
+                color: #0047AB;  /* Ocean Blue Text */
+                text-align: center;
+                background: white; /* White Background */
+                border: 2px solid #0047AB; /* Blue Border */
+                border-radius: 8px;
+                cursor: pointer;
+                transition: 0.3s;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            div.stButton > button:hover {
+                background: #0047AB; /* Blue Background on Hover */
+                color: white; /* White Text on Hover */
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+
+
+# Initialize session state
+if "page" not in st.session_state:
+    st.session_state["page"] = "Home"
+if "subpage" not in st.session_state:
+    st.session_state["subpage"] = None
+	
+# Navigation functions
+def navigate_to(page_name, subpage_name=None):
+    st.session_state["page"] = page_name
+    st.session_state["subpage"] = subpage_name
+
+if st.session_state["page"] == "Home":
+    st.markdown(
+    """
+    <style>
+        .unique-title {
+            text-align: center;
+            font-size: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #0047AB; /* Ocean Blue */
+            white-space: nowrap; /* Ensures it's always on one line */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: linear-gradient(to right, #0047AB, #007BFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            position: relative;
+            top: -20px; /* Moves text higher */
+        }
+    </style>
+    <div class='unique-title'>EMPLOYEE ATTRITION ANALYSIS AND PREDICTION</div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
+
+    # st.image(r'https://th.bing.com/th/id/OIP.XYqwtumU1KttgweY4tInCQHaEf?w=1000&h=607&rs=1&pid=ImgDetMain')
+    col1, col2 = st.columns(2)
+    image_size = 150
+
+    with col1:
+        st.image(
+            r"https://www.r-exercises.com/wp-content/uploads/2016/11/Selecting-a-Real-Estate-Agent-Red.png",
+            use_container_width=True,
+        )
+        if st.button("Predicting Employee Attrition", use_container_width=True):
+            navigate_to("Predicting Employee Attrition")
+        
+
+    with col2:
+        st.image(
+            r"https://th.bing.com/th/id/OIP.F_v2ZXGhy9OlR_QbYA-NXgHaHa?pid=ImgDet&w=170.41420118343197&h=180&c=7&dpr=1.3",
+            use_container_width=True,
+        )
+        if st.button("Predicting Performance Rating", use_container_width=True):
+            navigate_to("Predicting Performance Rating")
 
 #Employee Attrition Prediction
-if selected == 'Employee Attrition Prediction':
+if st.session_state["page"] == "Predicting Employee Attrition":
+    st.markdown(
+    """
+    <style>
+        .eda-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap; /* Ensures it's always on one line */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            top: -10px; /* Moves text slightly up */
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #0047AB, #007BFF); /* Ocean Blue Gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+    <div class='eda-title'>Employee Attrition Prediction using ML</div>
+    """,
+    unsafe_allow_html=True
+    )
+
+    st.markdown(
+    "<h4 style='text-align: center;'>Predict whether an employee will leave the company (attrition).</h4>",
+    unsafe_allow_html=True
+    )
     
-    st.title(":red[Employee Attrition Prediction using ML]")
-    # image = Image.open('Kidney.jpg')
-    # st.image(image, caption='Kidney disease')
-    name = st.text_input("Name:")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        Age = st.number_input('Age')
-
-    with col2:
-        DailyRate = st.number_input('DailyRate')
-
+	  
+	
+    st.write("Press the button to go back to Home/Previous Page:")  
+    col3,col4=st.columns(2)
     with col3:
-        Department = st.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
-        if Department == "Sales":
-            Department = 1
-        elif Department == "Research & Development":
-            Department = 2
-        else:
-            Department = 3
+      if st.button("🔙 Back", use_container_width=True):
+            navigate_to("Home")
     with col4:
-        DistanceFromHome = st.number_input('DistanceFromHome')
+      if st.button("🏠 Home", use_container_width=True):
+            navigate_to("Home")
 
+    # Load the trained models
+    decisionforemployeeattri = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_decisionforemployeeattri.pkl')
+    ohe_for_emp_att = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_onehotencoderforemp_attri.pkl')
+    le_for_emp_att = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_labelforemployeeattri.pkl')
+
+        
+
+    st.header("Enter Employee Details")
+
+    # User input fields
+    # First row
+    col1, col2, col3 = st.columns(3)
     with col1:
-        Education = st.number_input('Education')
+        age = st.number_input("Age", min_value=18, max_value=65, step=1)
+    with col2:
+        handled_MonthlyIncome = st.number_input("Monthly Income", min_value=1000, step=500)
+    with col3:
+                JobSatisfaction = st.slider("Job Satisfaction", min_value=1, max_value=5, step=1)
+
+    # Second row
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        YearsAtCompany = st.number_input("Years at Company", min_value=0, step=1)
+    with col2:
+        overtime = st.selectbox("Overtime", ['Yes', 'No'])
+        
+    with col3:
+        NumCompaniesWorked = st.number_input("Number of Companies Worked", min_value=0, step=1)
+
+    # Third row (Categorical)
+    col1, col2 = st.columns(2)
+    with col1:
+        Department = st.selectbox("Department", ['Sales', 'HR', 'Research & Development'])
+    with col2:
+        MaritalStatus = st.selectbox("Marital Status", ['Single', 'Married', 'Divorced'])
+
+
+    # Convert to DataFrame
+    le_ot = le_for_emp_att.transform(np.array([overtime]).reshape(1, -1)).flatten()[0]  
+    user_data = pd.DataFrame({'Department': [Department], 'MaritalStatus': [MaritalStatus]})
+    encoded_user_input = ohe_for_emp_att.transform(user_data)
+
+    # Convert numerical inputs to NumPy array
+    num_inputs = np.array([age, handled_MonthlyIncome, JobSatisfaction, YearsAtCompany, le_ot, NumCompaniesWorked]).reshape(1, -1)
+
+    # Concatenate numerical and categorical features
+    combined_input = np.concatenate([num_inputs, encoded_user_input], axis=1)
+
+    # Prediction
+    if st.button("Predict Attrition"):
+        employee_attrition = decisionforemployeeattri.predict(combined_input)[0]
+        
+        prediction_text = "Likely to Leave" if employee_attrition == 'Yes' else "Likely to Stay"
+        color = "green" if employee_attrition == 'No' else "red"
+        st.markdown(f"### <span style='color:{color};'>Employee Attrition Prediction: {prediction_text}</span>", unsafe_allow_html=True)
     
-    with col2:
-        EnvironmentSatisfaction = st.number_input('EnvironmentSatisfaction')
-
-    with col3:
-        Gender_Male = 0
-        display = ("male", "female")
-        options = list(range(len(display)))
-        value = st.selectbox("Gender", options, format_func=lambda x: display[x])
-        if value == "male":
-            Gender_Male = 1
-        elif value == "female":
-            Gender_Male = 0
-
-    with col4:
-        HourlyRate = st.number_input('HourlyRate')
-
-    with col1:
-        JobInvolvement = st.number_input('JobInvolvement')
-
-    with col2:
-        JobLevel = st.number_input('JobLevel')
-
-    with col3:
-        JobRole = st.selectbox("JobRole", ["Sales Representative",
-        "Sales Executive",
-        "Healthcare Representative",
-        "Laboratory Technician",
-        "Research Scientist",
-        "Research Director",
-        "Manufacturing Director",
-        "Manager",
-        "Human Resources"])
-        if JobRole == "Sales Representative":
-            JobRole = 1
-        if JobRole == "Sales Executive":
-            JobRole = 2
-        if JobRole == "Healthcare Representative":
-            JobRole = 3
-        if JobRole == "Laboratory Technician":
-            JobRole = 4
-        if JobRole == "Research Scientist":
-            JobRole = 5
-        if JobRole == "Research Director":
-            JobRole = 6
-        if JobRole == "Manufacturing Director":
-            JobRole = 7
-        if JobRole == "Manager":
-            JobRole = 8
-        else:
-            JobRole = 9
-         
-
-    with col4:
-       JobSatisfaction = st.number_input('JobSatisfaction')
-
-    with col1:
-        MaritalStatus  = st.selectbox("MaritalStatus", ["Divorced", "Single", "Married"])
-        if Department == "Single":
-            MaritalStatus = 1
-        elif Department == "Married":
-            MaritalStatus = 2
-        else:
-            MaritalStatus = 0
-
-    with col2:
-        MonthlyIncome = st.number_input('MonthlyIncome')
-
-    with col3:
-        MonthlyRate = st.number_input('MonthlyRate')
-
-    with col4:
-        NumCompaniesWorked = st.number_input('NumCompaniesWorked')
-
-    with col1:
-        OverTime = st.selectbox("OverTime", ["yes", "no"])
-        OverTime = 1 if OverTime == "yes" else 0
-
-    with col2:
-        PercentSalaryHike = st.number_input('PercentSalaryHike')
-
-    with col3:
-        PerformanceRating  = st.number_input('PerformanceRating ')
-
-    with col4:
-        RelationshipSatisfaction = st.number_input('RelationshipSatisfaction')
-
-    with col1:
-        StockOptionLevel = st.number_input('StockOptionLevel')
-
-    with col2:
-        TotalWorkingYears = st.number_input('TotalWorkingYears')
-
-    with col3:
-        TrainingTimesLastYear = st.number_input('TrainingTimesLastYear')
-
-    with col4:
-        WorkLifeBalance = st.number_input('WorkLifeBalance')
-
-    with col1:
-        YearsAtCompany = st.number_input('YearsAtCompany')
-
-    with col2:
-        YearsInCurrentRole = st.number_input('YearsInCurrentRole')
-
-    with col3:
-        YearsSinceLastPromotion = st.number_input('YearsSinceLastPromotion')
-
-    with col4:
-        YearsWithCurrManager = st.number_input('YearsWithCurrManager')
-
-
-    # code for Prediction
-    Attrition_diagnosis = ''
-
-    # creating a button for Prediction    
-    if st.button("Employee Attrition Prediction Result"):
-
-        user_input = [Age, DailyRate, Department, DistanceFromHome, Education, EnvironmentSatisfaction, Gender_Male,
-                       HourlyRate, JobInvolvement, JobLevel, JobRole, JobSatisfaction, MaritalStatus, MonthlyIncome, MonthlyRate, 
-                       NumCompaniesWorked, OverTime, PercentSalaryHike, PerformanceRating, RelationshipSatisfaction, StockOptionLevel, 
-                       TotalWorkingYears, TrainingTimesLastYear, WorkLifeBalance, YearsAtCompany, YearsInCurrentRole, 
-                       YearsSinceLastPromotion, YearsWithCurrManager]
-
-        prediction = Attrition_model.predict([user_input])
-
-        if prediction[0] == 1:
-            Attrition_diagnosis = "The employee leaving the organizations for an reason"
-            # image = Image.open('positive.jpg')
-            # st.image(image, caption='')
-        else:
-            Attrition_diagnosis = "The employee stayed in the organizations"
-            # image = Image.open('negative.jpg')
-            # st.image(image, caption='')
-    st.success('Hi'+' '+name+' , ' + Attrition_diagnosis)
+    # Visualization
+        st.subheader("Employee Attributes")
+        st.bar_chart(pd.DataFrame({
+            "Feature": ["Age", "Monthly Income", "Job Satisfaction", "Years at Company", "Overtime", "Companies Worked"],
+            "Value": [age, handled_MonthlyIncome, JobSatisfaction, YearsAtCompany, le_ot, NumCompaniesWorked]
+        }).set_index("Feature")) 
 
 
 #Employee Promotion Prediction
-if selected == 'Employee Promotion Prediction':
+elif st.session_state.get("page") == "Predicting Performance Rating":
     
-    st.title(":red[Employee Promotion Prediction using ML]")
-    # image = Image.open('Kidney.jpg')
-    # st.image(image, caption='Kidney disease')
-    name = st.text_input("Name:")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        Age = st.number_input('Age', min_value=18, max_value=65, step=1)
-
-    with col2:
-        DailyRate = st.number_input('DailyRate',min_value=102, max_value=1496, step=1)
-
+    st.markdown(
+        """
+        <style>
+            .eda-title {
+                text-align: center;
+                font-size: 36px;
+                font-weight: bold;
+                text-transform: uppercase;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                position: relative;
+                top: -10px;
+                letter-spacing: 1px;
+                background: linear-gradient(to right, #0047AB, #007BFF);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        </style>
+        <div class='eda-title'>Employee Performance Prediction using ML</div>
+        """,
+        unsafe_allow_html=True
+    )
+	
+	  
+			
+    st.write("Press the button to go back to Home/Previous Page:")
+    col3,col4=st.columns(2)
     with col3:
-        HourlyRate = st.number_input('HourlyRate',min_value=30, max_value=100, step=1)
-
+      if st.button("🔙 Back", use_container_width=True):
+        navigate_to("Home")
     with col4:
-        DistanceFromHome = st.number_input('DistanceFromHome',min_value=1, max_value=29, step=1)
-
-    with col1:
-        MonthlyIncome = st.number_input('MonthlyIncome',min_value=1009, max_value=19999, step=1)
-
-    with col2:
-        MonthlyRate = st.number_input('MonthlyRate',min_value=2094, max_value=26999, step=1)
-
-    with col3:
-        PercentSalaryHike = st.number_input('PercentSalaryHike',min_value=11, max_value=25, step=1)
-         
-    with col4:
-        EmployeeNumber = st.number_input('EmployeeNumber',min_value=1, max_value=2068, step=1)
-
-    with col1:
-        TotalWorkingYears = st.number_input('TotalWorkingYears',min_value=0, max_value=40, step=1)
-
-    with col2:
-        YearsAtCompany = st.number_input('YearsAtCompany',min_value=0, max_value=40, step=1)
-
-    user_input = np.array([Age, YearsAtCompany, TotalWorkingYears, DailyRate, PercentSalaryHike, DistanceFromHome, 
-                           MonthlyRate, MonthlyIncome, EmployeeNumber, HourlyRate])
+      if st.button("🏠 Home", use_container_width=True):
+        navigate_to("Home")
     
-    user_input = user_input.reshape(1, -1) 
 
-    # creating a button for Prediction    
-    if st.button(" Employee Promotion Prediction Result"):
-        prediction = Promotion_model.predict(user_input)
-        # rounded_prediction = round(prediction[0])
-        st.success(f"the Employee {name} got Promotion by {prediction[0]:,.1f} years") 
-        # prediction[0]:,.1f
+
+    ohe_for_job_sat = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_onehotforjobsat.pkl')
+    label_for_job_sat = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_labelforjobsat.pkl')
+    logistic_model = joblib.load(r'/content/drive/MyDrive/Employee Attrition Analysis and Prediction/_Models_logistic_for_performance_rating.pkl')
+
+# Page title
+
+        
+    # ---------- Input Form ----------
+    st.write("Fill in the details to predict the employee's performance rating:")
+    with st.form("perf_form"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            Age = st.number_input("Age", min_value=18, max_value=60, step=1)
+            DistanceFromHome = st.number_input("Distance from Home", step=1)
+            Education = st.selectbox("Education Level", [1, 2, 3, 4, 5])
+            EnvironmentSatisfaction = st.slider("Environment Satisfaction", 1, 4)
+            JobInvolvement = st.slider("Job Involvement", 1, 4)
+            MonthlyIncome = st.number_input("Monthly Income", step=100)
+            
+        with col2:
+            MonthlyRate = st.number_input("Monthly Rate", step=100)
+            PercentSalaryHike = st.slider("Percent Salary Hike", 0, 100)
+            RelationshipSatisfaction = st.slider("Relationship Satisfaction", 1, 4)
+            WorkLifeBalance = st.slider("Work-Life Balance", 1, 4)
+            YearsInCurrentRole = st.number_input("Years in Current Role", step=1)
+            OverTime = st.selectbox("OverTime", ["Yes", "No"])
+            
+        with col3:
+        # Categorical inputs
+            BusinessTravel = st.selectbox("Business Travel", ["Non-Travel", "Travel_Frequently", "Travel_Rarely"])
+            Department = st.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
+            EducationField = st.selectbox("Education Field", ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Human Resources", "Other"])
+            Gender = st.selectbox("Gender", ["Male", "Female"])
+            JobRole = st.selectbox("Job Role", ["Sales Executive", "Research Scientist", "Laboratory Technician", "Manufacturing Director", 
+                                            "Healthcare Representative", "Manager", "Sales Representative", 
+                                            "Research Director", "Human Resources"])
+            MaritalStatus = st.selectbox("Marital Status", ["Single", "Married", "Divorced"])
+        submitted = st.form_submit_button("Predict")
+
+        if submitted:
+        # Numerical inputs
+            numerical_inputs = [
+                Age,
+                DistanceFromHome,
+                Education,
+                EnvironmentSatisfaction,
+                JobInvolvement,
+                MonthlyIncome,
+                MonthlyRate,
+                PercentSalaryHike,
+                RelationshipSatisfaction,
+                WorkLifeBalance,
+                YearsInCurrentRole,
+                label_for_job_sat.transform([[OverTime]])[0],
+                
+            ]
+
+        # Categorical inputs
+            cat_input = pd.DataFrame([{
+            "BusinessTravel": BusinessTravel,
+            "Department": Department,
+            "EducationField": EducationField,
+            "Gender": Gender,
+            "JobRole": JobRole,
+            "MaritalStatus": MaritalStatus
+            }])
+
+            cat_encoded = ohe_for_job_sat.transform(cat_input)
+
+        # Final input
+            final_input = np.concatenate([np.array(numerical_inputs).reshape(1, -1), cat_encoded], axis=1)
+
+            prediction = logistic_model.predict(final_input)[0]
+
+# Map prediction to label
+            rating_label = {
+    3: "Excellent (Exceeds Expectations)",
+    4: "Outstanding (Top Performer)"
+    }.get(prediction, "Unknown")
+
+# Set background gradient by rating
+            bg_gradient = "linear-gradient(to right, #3A7BD5, #00d2ff);" if prediction == 3 else "linear-gradient(to right, #8E2DE2, #4A00E0);"
+
+# Styled block with CSS
+            st.markdown(f"""
+    <div style="
+        padding: 1.5rem;
+        border-radius: 15px;
+        background: {bg_gradient};
+        color: white;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        margin-top: 20px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    ">
+         Predicted Performance Rating: {prediction} - {rating_label}
+    </div>
+""", unsafe_allow_html=True)

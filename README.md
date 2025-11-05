@@ -3,7 +3,7 @@
 # Employee Attrition and Performance Rating Analysis with Prediction
 
 ## Project Overview
-This project analyzes employee attrition using machine learning techniques to identify key factors influencing employee turnover. The goal is to build a predictive model that helps organizations retain valuable employees by addressing potential attrition risks.
+This project analyses employee attrition using machine learning techniques to identify key factors influencing employee turnover. The goal is to build a predictive model that helps organizations retain valuable employees by addressing potential attrition risks.
 
 ## Dataset
 The dataset includes various employee attributes such as:

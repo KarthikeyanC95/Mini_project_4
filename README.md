@@ -1047,9 +1047,15 @@ The ultimate goal is to provide organizations with actionable insights that can 
 
 ---
 
-👥 Authors
-Your Name - Karthikeyan C, Aspiring Data Scientist
+## 👥 Authors
 
+- Your Name - Karthikeyan C, Aspiring Data Scientist
 
-📞 Contact
-Project Link: https://github.com/KarthikeyanC95/Mini_project_4
+## 🙏 Acknowledgments
+
+- Streamlit community
+
+## 📞 Contact
+
+Project Link: [https://github.com/KarthikeyanC95/Mini_project_4](https://github.com/KarthikeyanC95/Mini_project_4)
+

@@ -1049,10 +1049,7 @@ The ultimate goal is to provide organizations with actionable insights that can 
 
 👥 Authors
 Your Name - Karthikeyan C, Aspiring Data Scientist
-🙏 Acknowledgments
-Helsinki-NLP for translation models
-Facebook AI for BART summarization
-Hugging Face Transformers library
-Streamlit community
+
+
 📞 Contact
 Project Link: https://github.com/KarthikeyanC95/Mini_project_4
